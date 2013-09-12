@@ -13,7 +13,7 @@ import scipy.spatial.distance as ssd
 import scipy.cluster.vq as scv
 import numpy as np
 import numpy.linalg as npla
-import networkx as nx
+#import networkx as nx
 import matplotlib.colors as mpc
 import random
 import matplotlib._pylab_helpers
@@ -24,27 +24,6 @@ from vizLib import *
 from string import ascii_letters
 from matplotlib import mpl
 from mpl_toolkits.mplot3d import Axes3D
-
-def readDataFile(filename, scale=1.0):
-    """readDataFile reads a datafile. The datafile should be tab separated and have both column and row headers listing the proteins/fractions.
-    Empty values should be empty, they will be treated as np.NAN - see lambda below
-    readDataFile takes an optional scale that will multiply the data by the specified factor - useful for "scaling" error
-
-    :param filename: a string of the filename to be read
-    :type filename: string
-    :param scale: a float indicating how to scale the data, default is unscaled (1)
-    :type scale: float
-    :returns:  a data ditionary. 'data', 'fractions', 'proteins' are filled in, others are None
-
-    """
-    with open(filename, 'rb') as inputFile:
-        csvFile = list(csv.reader(inputFile, delimiter = '\t'))
-        header = csvFile[0]
-        proteins = [row[0] for row in csvFile[1:]]
-        insertValue2 = lambda x, y: np.NAN if x=='' else float(x)*y
-        data = np.array([[insertValue2(col, scale) for col in row[1:]] for row in csvFile[1:]])
-        inputFile.close()
-        return {'fractions':header[1:], 'proteins':proteins, 'fi':None, 'pi':None, 'data':data}
 
 def transformData(x, y, rowMethod, columnMethod):
     """transformData transforms an object x according to indicies in object y; used to sort different datasets by the same protein/fraction indicies
@@ -70,7 +49,7 @@ def transformData(x, y, rowMethod, columnMethod):
         xt = xt[:,idx2]
     toReturn['data'] = xt
     return toReturn
-    
+
 def clusterData(xdata, rowMethod=True, columnMethod=False, method='average', metric='euclidean'):
     """clusterData clusters the data either by row, by column, or both
 
