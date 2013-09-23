@@ -185,6 +185,16 @@ def fillMeanStdArray(residHash):
     stdArray = np.array(stdArray)
     return meanArray, stdArray
 
+def getSigs(Sig):
+    h = len(Sig)
+    w = len(Sig[0])
+    end = min(h,w)
+    sigs = []
+    for i in range(0,end):
+        sigs.append(Sig[i][i]*Sig[i][i])
+    return sigs
+        
+
 def SVD(data):
     """SVD performs singular value decomposition on a 2D matrix dataset
 
