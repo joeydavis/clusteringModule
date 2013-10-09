@@ -25,6 +25,14 @@ from string import ascii_letters
 from matplotlib import mpl
 from mpl_toolkits.mplot3d import Axes3D
 
+def takeRatio(num,den):
+    toReturn = num.copy()
+    toReturn['data'] = numpy.log(num['data']/den['data'])
+    whereBad = np.isnan(toReturn['data']) | np.isinf(toReturn['data']) | np.isneginf(toReturn['data'])
+    toReturn['data'][whereBad] = 0.0
+    
+    return toReturn
+
 def transformData(x, y, rowMethod, columnMethod):
     """transformData transforms an object x according to indicies in object y; used to sort different datasets by the same protein/fraction indicies
 
@@ -229,6 +237,7 @@ def reconstructWithSVD(data, U, Sig, Vh, comps):
     M,N = data.shape
     test = np.zeros((N,N))
     i = 0
+    comps = min(comps, M, N)
     while i < comps:
         test[i,i] = 1
         i = i +1
@@ -427,6 +436,22 @@ def makeKMeansCorrelationMatrix(allKmRuns, clusteredData):
     correlationData['fractions'] = correlationData['proteins']
     return correlationData
 
+def calculateSVDVariance(dataMatrix, drawVariance=False):
+    dataSVD = SVD(dataMatrix['data'])
+    dataSig = getSigs(dataSVD[1])
+    tot = 0.0
+    for i in dataSig:
+        tot = tot + i
+    cs = numpy.cumsum(dataSig)
+    cs = cs/tot
+    if drawVariance:
+        pylab.figure()
+        pylab.plot(range(1,len(cs)+1), cs, 'ro')
+        pylab.xlim((0,len(cs)))
+        pylab.ylim((cs[0]-0.1,1.1))
+        pylab.xlabel('number of components')
+        pylab.ylabel('fraction variance captured')
+    return [dataSVD,cs]
 
 def drawSprings(corrMatrix, kclusters, initialPosFileName, mult=1.1):
     """drawSprings draws two figures, one of the spring evolution at 9 timepoints, one of the initial vs. final.
